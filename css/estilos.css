@@ -1,0 +1,340 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding-bottom: 32px;
+}
+
+header {
+    background-color: #1d4ed8;
+    padding: 32px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.025em;
+}
+
+main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.recebe {
+    background-color: var(--bg-card);
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+h2 {
+    font-size: 21px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+h2::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 20px;
+    background-color: var(--primary);
+    border-radius: 2px;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.form-group {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+input[type="text"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: var(--primary);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+button[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+/* Estilos para os registros */
+.sem-registros {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 32px;
+    font-style: italic;
+}
+
+.emprestimo-card {
+    background-color: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+}
+
+.emprestimo-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.emprestimo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.emprestimo-titulo {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.plaqueta-badge {
+    background-color: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.emprestimo-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    font-size: 14px;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.emprestimo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.status-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-assinado {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.status-ativo {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-atrasado {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-assinar {
+    background-color: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-assinar:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.btn-devolver {
+    background-color: var(--success);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.btn-devolver:hover {
+    background-color: #059669;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.btn-excluir {
+    background-color: var(--danger);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.btn-excluir:hover {
+    background-color: #dc2626;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.signature-tracking {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.checkbox-container input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+@media (max-width: 680px) {
+    .emprestimo-header {
+        flex-direction: column;
+    }
+    
+    .emprestimo-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .emprestimo-footer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+}

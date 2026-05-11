@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seção de Empréstimo de Chromebooks</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <header>
+        <h1>Empréstimos de Chromebooks</h1>
+    </header>
+    <main>
+        <section id="recebe" class="recebe">
+            <h2>Recebimento</h2>
+            <form id="formEmprestimo">
+                <article class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </article>
+                <article class="form-group">
+                    <label for="setor">Setor:</label>
+                    <input type="text" id="setor" name="setor" required>
+                </article>
+                <article class="form-group">
+                    <label for="matricula">Matrícula:</label>
+                    <input type="text" id="matricula" name="matricula" required>
+                </article>
+                <article class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="text" id="telefone" name="telefone" required>
+                </article>
+                <article class="form-group">
+                    <label for="plaqueta">Número da plaqueta:</label>
+                    <input type="text" id="plaqueta" name="plaqueta" required>
+                </article>
+                <article class="form-group">
+                    <label for="data_emprestimo">Data de Empréstimo:</label>
+                    <input type="date" id="data_emprestimo" name="data_emprestimo" required>
+                </article>
+                <article class="form-group">
+                    <label for="data_devolucao">Data de Devolução:</label>
+                    <input type="date" id="data_devolucao" name="data_devolucao" required>
+                </article>
+                <article class="form-group">
+                    <label for="cedente">Cedente:</label>
+                    <select name="cedente" id="cedente" required>
+                        <option value="" disabled selected>Selecione o cedente</option>
+                        <option value="Jailson Borges - GAUST">Jailson Borges - GAUST</option>
+                        <option value="Pabllo Silva - DTI">Pabllo Silva - DTI</option>
+                    </select>
+                </article>
+                <button type="submit">Emprestar</button>
+            </form>
+        </section>
+
+        <!-- Seção de Registros -->
+        <section id="registros" class="recebe" style="margin-top: 32px;">
+            <h2>Empréstimos Registrados</h2>
+            <div id="listaEmprestimos">
+                <p class="sem-registros">Nenhum empréstimo registrado ainda.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/scripts.js"></script>
+</body>
+</html>
