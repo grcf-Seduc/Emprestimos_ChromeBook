@@ -149,12 +149,6 @@ function renderizar() {
         const condicaoBadge = getCondicaoBadge(cb.condicao);
         const podeExcluir   = statusReal !== 'emprestado';
 
-        const btnManutencao = statusReal !== 'emprestado'
-            ? `<button class="btn-sm btn-manutencao" onclick="toggleManutencao('${cb.plaqueta}')">
-                   ${cb.status === 'manutencao' ? 'Liberar' : 'Manutenção'}
-               </button>`
-            : '';
-
         return `
             <tr>
                 <td><strong>${cb.plaqueta}</strong></td>
@@ -162,11 +156,21 @@ function renderizar() {
                 <td>${statusBadge}</td>
                 <td>
                     <div class="acoes-cell">
-                        <button class="btn-sm btn-editar" onclick="editarCondicao('${cb.plaqueta}')">Editar</button>
-                        ${btnManutencao}
-                        ${podeExcluir
-                            ? `<button class="btn-sm btn-excluir-sm" onclick="excluir('${cb.plaqueta}')">Excluir</button>`
+                        ${statusReal === 'disponivel'
+                            ? `<a href="index.html?plaqueta=${cb.plaqueta}" class="btn-sm btn-emprestar">Emprestar</a>`
                             : ''}
+                        <div class="dropdown-container">
+                            <button class="btn-sm btn-dots" onclick="toggleDropdown(event, '${cb.plaqueta}')">•••</button>
+                            <div class="dropdown-menu" id="dropdown-${cb.plaqueta}">
+                                <button class="dropdown-item" onclick="editarCondicao('${cb.plaqueta}')">Editar condição</button>
+                                ${statusReal !== 'emprestado'
+                                    ? `<button class="dropdown-item" onclick="toggleManutencao('${cb.plaqueta}')">${cb.status === 'manutencao' ? 'Liberar' : 'Em Manutenção'}</button>`
+                                    : ''}
+                                ${podeExcluir
+                                    ? `<button class="dropdown-item dropdown-item-danger" onclick="excluir('${cb.plaqueta}')">Excluir</button>`
+                                    : ''}
+                            </div>
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -282,3 +286,21 @@ async function excluir(plaqueta) {
     chromebooks = chromebooks.filter(c => c.plaqueta !== plaqueta);
     renderizar();
 }
+
+// ── Dropdown de ações ─────────────────────────────────────────
+// Abre/fecha o menu "•••" do chromebook clicado.
+// stopPropagation impede que o clique feche o menu imediatamente
+// pelo listener global do document abaixo.
+function toggleDropdown(event, plaqueta) {
+    event.stopPropagation();
+    const menu = document.getElementById(`dropdown-${plaqueta}`);
+    const isOpen = menu.classList.contains('open');
+    // Fecha todos os outros dropdowns abertos antes de abrir este
+    document.querySelectorAll('.dropdown-menu.open').forEach(d => d.classList.remove('open'));
+    if (!isOpen) menu.classList.add('open');
+}
+
+// Fecha qualquer dropdown aberto ao clicar fora dele
+document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown-menu.open').forEach(d => d.classList.remove('open'));
+});

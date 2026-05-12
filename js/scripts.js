@@ -14,6 +14,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderizarEmprestimos();
     // Preenche a data de empréstimo com a data de hoje automaticamente
     document.getElementById('data_emprestimo').value = new Date().toISOString().split('T')[0];
+
+    // Se a página foi aberta pelo botão "Emprestar" do inventário,
+    // a plaqueta vem na URL: index.html?plaqueta=557380
+    // Pré-preenche o campo e rola a tela até o formulário.
+    const plaquetaParam = new URLSearchParams(window.location.search).get('plaqueta');
+    if (plaquetaParam) {
+        document.getElementById('plaqueta').value = plaquetaParam;
+        document.getElementById('recebe').scrollIntoView({ behavior: 'smooth' });
+    }
 });
 
 // ── Carregar empréstimos do Supabase ──────────────────────────

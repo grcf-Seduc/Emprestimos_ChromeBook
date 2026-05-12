@@ -664,3 +664,67 @@ button[type="submit"]:active {
 /* Botão Excluir (tabela): vermelho suave (diferente do btn-excluir dos cards) */
 .btn-excluir-sm       { background-color: #fee2e2; color: #991b1b; }
 .btn-excluir-sm:hover { background-color: #fecaca; }
+
+/* Botão Emprestar: verde, leva para index.html com plaqueta pré-preenchida */
+.btn-emprestar {
+    background-color: var(--success);
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-emprestar:hover { background-color: #059669; color: white; }
+
+/* Botão "•••" que abre o dropdown de ações */
+.btn-dots {
+    background-color: #f1f5f9;
+    color: var(--text-main);
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 5px 10px;
+}
+.btn-dots:hover { background-color: #e2e8f0; }
+
+/* Container do dropdown: position relative para ancorar o menu */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Menu dropdown: oculto por padrão, exibido com a classe .open */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    min-width: 150px;
+    z-index: 100;
+    overflow: hidden;
+}
+.dropdown-menu.open { display: block; }
+
+/* Cada opção dentro do dropdown */
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.dropdown-item:last-child  { border-bottom: none; }
+.dropdown-item:hover       { background-color: #f8fafc; }
+
+/* Item de exclusão em vermelho */
+.dropdown-item-danger       { color: var(--danger); }
+.dropdown-item-danger:hover { background-color: #fee2e2; }
