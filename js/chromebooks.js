@@ -1,23 +1,11 @@
 ﻿// =============================================================
-// chromebooks.js — Lógica da página de Inventário
-// Responsável por: cadastrar chromebooks no inventário,
-// exibir a tabela com plaqueta/condição/status, atualizar os
-// cards de resumo e gerenciar as ações de editar, colocar em
-// manutenção e excluir.
-//
-// IMPORTANTE: o status "Emprestado" é derivado automaticamente
-// consultando o localStorage de empréstimos (chave 'emprestimos').
-// Isso significa que ao registrar um empréstimo em index.html,
-// o inventário reflete o status correto sem precisar de
-// nenhuma atualização manual.
+// chromebooks.js — Inventário, conectado ao Supabase
+// O cliente 'db' vem de supabase-config.js.
 // =============================================================
 
-
-// ── Dados padrão do inventário ────────────────────────────────
-// Lista inicial dos 16 Chromebooks do patrimônio.
-// Carregada automaticamente na primeira vez que a página é aberta
-// (quando o localStorage ainda não tem dados salvos).
-// EST. CONS. 02 da planilha patrimonial = condição "Bom".
+// Dados patrimoniais padrão: carregados automaticamente na primeira
+// vez que a página abre (quando a tabela chromebooks está vazia).
+// EST. CONS. 02 da planilha = condição "Bom".
 const CHROMEBOOKS_PADRAO = [
     { plaqueta: '557375', condicao: 'Bom', status: 'disponivel' },
     { plaqueta: '557380', condicao: 'Bom', status: 'disponivel' },
@@ -37,174 +25,155 @@ const CHROMEBOOKS_PADRAO = [
     { plaqueta: '557604', condicao: 'Bom', status: 'disponivel' },
 ];
 
-
-// ── Armazenamento em memória ──────────────────────────────────
-// 'chromebooks' guarda o inventário (plaqueta, condição, status manual).
-// 'emprestimos' é lido do localStorage para derivar o status real.
 let chromebooks = [];
 let emprestimos = [];
 
-
-// ── Inicialização da página ───────────────────────────────────
-// Aguarda o HTML estar pronto antes de tentar acessar os elementos.
-document.addEventListener('DOMContentLoaded', () => {
-    carregar();    // lê ambos os arrays do localStorage (ou semeia os padrões)
-    renderizar();  // desenha a tabela e atualiza os cards de resumo
+// ── Inicialização ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregar();
+    renderizar();
 });
 
+// ── Carregar dados do Supabase ────────────────────────────────
+// Lê o inventário e os empréstimos ativos.
+// Se o inventário estiver vazio (primeira vez), insere os 16 padrões.
+async function carregar() {
+    // 1. Carrega inventário
+    const { data: cbData, error: cbError } = await db
+        .from('chromebooks')
+        .select('*');
 
-// ── Carregar dados do localStorage ───────────────────────────
-// Lê as duas chaves independentes do localStorage:
-//   'chromebooks' → inventário gerenciado por esta página
-//   'emprestimos' → registros criados em index.html
-//
-// Se 'chromebooks' não existir ainda (primeira visita), semeia
-// automaticamente com os 16 Chromebooks do patrimônio (CHROMEBOOKS_PADRAO).
-function carregar() {
-    const saved = localStorage.getItem('chromebooks');
-    if (saved) {
-        chromebooks = JSON.parse(saved);
-    } else {
-        // Primeira vez: popula com os dados patrimoniais e persiste
-        chromebooks = CHROMEBOOKS_PADRAO.map(cb => ({ ...cb })); // cópia para não poluir o original
-        salvar();
+    if (cbError) {
+        console.error('Erro ao carregar inventário:', cbError.message);
+        alert('Não foi possível carregar o inventário.');
+        return;
     }
 
-    const emp = localStorage.getItem('emprestimos');
-    if (emp) emprestimos = JSON.parse(emp);
+    if (!cbData || cbData.length === 0) {
+        // Primeira visita: insere os 16 chromebooks patrimoniais
+        const { data: inseridos, error: insertError } = await db
+            .from('chromebooks')
+            .insert(CHROMEBOOKS_PADRAO)
+            .select();
+
+        if (insertError) {
+            console.error('Erro ao inserir dados padrão:', insertError.message);
+        } else {
+            chromebooks = inseridos || [];
+        }
+    } else {
+        chromebooks = cbData;
+    }
+
+    // 2. Carrega empréstimos ativos para derivar o status de cada chromebook
+    // Busca apenas os campos necessários (plaqueta e status) para economizar banda
+    const { data: empData, error: empError } = await db
+        .from('emprestimos')
+        .select('plaqueta, status');
+
+    if (empError) {
+        console.error('Erro ao carregar empréstimos:', empError.message);
+    } else {
+        emprestimos = empData || [];
+    }
 }
 
-
-// ── Salvar inventário no localStorage ────────────────────────
-// Persiste apenas o array 'chromebooks'.
-// O array 'emprestimos' não é salvo aqui; ele é de responsabilidade
-// do scripts.js e só é lido nesta página para consultar status.
-function salvar() {
-    localStorage.setItem('chromebooks', JSON.stringify(chromebooks));
-}
-
-
-// ── Calcular o status real de um chromebook ───────────────────
-// Esta é a função central do inventário:
-// 1. Consulta o array de empréstimos em busca de um registro
-//    com a mesma plaqueta e status 'ativo'.
-// 2. Se encontrar → retorna 'emprestado' (não pode ser alterado manualmente).
-// 3. Se não encontrar → retorna o status manual salvo no inventário
-//    ('disponivel' ou 'manutencao').
+// ── Status real: verifica se o chromebook está emprestado ─────
+// Consulta o array de empréstimos em memória para derivar o status.
+// Se houver um empréstimo ativo com essa plaqueta, retorna 'emprestado'.
+// Caso contrário, retorna o status manual do inventário.
 function getStatusReal(plaqueta) {
     const emprestado = emprestimos.find(
         e => e.plaqueta === plaqueta && e.status === 'ativo'
     );
     if (emprestado) return 'emprestado';
-
-    // Busca o chromebook no inventário local para ler o status manual
     const cb = chromebooks.find(c => c.plaqueta === plaqueta);
-    return cb ? cb.status : 'disponivel'; // fallback: disponivel
+    return cb ? cb.status : 'disponivel';
 }
 
+// ── Cadastrar novo chromebook ─────────────────────────────────
+document.getElementById('formChromebook').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-// ── Capturar envio do formulário de cadastro ──────────────────
-// Adiciona um novo chromebook ao inventário ao clicar em
-// "Adicionar ao Inventário". Valida se a plaqueta já existe.
-document.getElementById('formChromebook').addEventListener('submit', (e) => {
-    e.preventDefault(); // impede o recarregamento da página
-
-    // Lê os três campos do formulário
-    const plaqueta = document.getElementById('plaqueta').value.trim(); // .trim() remove espaços acidentais
+    const plaqueta = document.getElementById('plaqueta').value.trim();
     const condicao = document.getElementById('condicao').value;
     const status   = document.getElementById('statusInicial').value;
 
-    // Impede duplicatas: cada plaqueta deve ser única no inventário
     if (chromebooks.some(c => c.plaqueta === plaqueta)) {
         alert('Essa plaqueta já está cadastrada!');
         return;
     }
 
-    // Adiciona o novo objeto ao array em memória e persiste
-    chromebooks.push({ plaqueta, condicao, status });
-    salvar();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Adicionando...';
+
+    const { data, error } = await db
+        .from('chromebooks')
+        .insert({ plaqueta, condicao, status })
+        .select()
+        .single();
+
+    btn.disabled = false;
+    btn.textContent = 'Adicionar ao Inventário';
+
+    if (error) {
+        console.error('Erro ao cadastrar:', error.message);
+        alert('Erro ao adicionar chromebook. Tente novamente.');
+        return;
+    }
+
+    chromebooks.push(data);
     renderizar();
-    e.target.reset(); // limpa o formulário para o próximo cadastro
+    e.target.reset();
     alert(`Chromebook ${plaqueta} adicionado ao inventário!`);
 });
 
-
-// ── Renderizar a tabela de inventário ─────────────────────────
-// Reconstrói toda a tabela sempre que algo muda.
-// Também relê 'emprestimos' do localStorage a cada chamada,
-// garantindo que o status esteja sempre atualizado.
+// ── Renderizar tabela ─────────────────────────────────────────
 function renderizar() {
-    // Relê os empréstimos para capturar qualquer mudança feita em
-    // outra aba/página desde a última renderização.
-    const emp = localStorage.getItem('emprestimos');
-    emprestimos = emp ? JSON.parse(emp) : [];
-
     const tbody = document.getElementById('chromebooksBody');
 
-    // Estado vazio: exibe mensagem na tabela e zera os cards
     if (chromebooks.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="sem-registros">Nenhum Chromebook cadastrado ainda.</td></tr>';
         atualizarStats([]);
         return;
     }
 
-    // Ordena pelo número da plaqueta em ordem crescente.
-    // localeCompare com { numeric: true } garante que "2" venha antes de "10"
-    // (comparação numérica), ao invés de "10" vir antes de "2"
-    // (comparação alfabética padrão).
     const sorted = [...chromebooks].sort(
         (a, b) => a.plaqueta.localeCompare(b.plaqueta, 'pt-BR', { numeric: true })
     );
 
-    // Gera o HTML de cada linha da tabela
     tbody.innerHTML = sorted.map(cb => {
-        const statusReal    = getStatusReal(cb.plaqueta); // status calculado dinamicamente
-        const statusBadge   = getStatusBadge(statusReal); // HTML do badge colorido
-        const condicaoBadge = getCondicaoBadge(cb.condicao); // HTML do badge de condição
+        const statusReal    = getStatusReal(cb.plaqueta);
+        const statusBadge   = getStatusBadge(statusReal);
+        const condicaoBadge = getCondicaoBadge(cb.condicao);
+        const podeExcluir   = statusReal !== 'emprestado';
 
-        // Não permite excluir se estiver emprestado (segurança de dados)
-        const podeExcluir = statusReal !== 'emprestado';
-
-        // O botão de manutenção só aparece se o chromebook NÃO estiver emprestado.
-        // Quando o status manual é 'manutencao', o texto muda para "Liberar" (toggle).
         const btnManutencao = statusReal !== 'emprestado'
             ? `<button class="btn-sm btn-manutencao" onclick="toggleManutencao('${cb.plaqueta}')">
                    ${cb.status === 'manutencao' ? 'Liberar' : 'Manutenção'}
                </button>`
-            : ''; // string vazia = botão não aparece
+            : '';
 
         return `
             <tr>
-                <!-- Número da plaqueta em negrito para fácil leitura -->
                 <td><strong>${cb.plaqueta}</strong></td>
-
-                <!-- Badge colorido: Bom (verde), Regular (laranja), Ruim (vermelho) -->
                 <td>${condicaoBadge}</td>
-
-                <!-- Badge de status calculado dinamicamente -->
                 <td>${statusBadge}</td>
-
-                <!-- Botões de ação: sempre mostra Editar; Manutenção e Excluir
-                     só aparecem se o chromebook não estiver emprestado -->
                 <td class="acoes-cell">
                     <button class="btn-sm btn-editar" onclick="editarCondicao('${cb.plaqueta}')">Editar</button>
                     ${btnManutencao}
                     ${podeExcluir
                         ? `<button class="btn-sm btn-excluir-sm" onclick="excluir('${cb.plaqueta}')">Excluir</button>`
-                        : '' // sem botão excluir para chromebooks emprestados
-                    }
+                        : ''}
                 </td>
             </tr>
         `;
-    }).join(''); // .join('') une todas as linhas em uma string HTML única
+    }).join('');
 
-    atualizarStats(sorted); // atualiza os 4 cards de contagem
+    atualizarStats(sorted);
 }
 
-
-// ── Gerar HTML do badge de status ─────────────────────────────
-// Usa um objeto como mapa de status → HTML, evitando if/else repetitivos.
-// Se o status não estiver no mapa, cria um badge sem classe específica.
 function getStatusBadge(status) {
     const map = {
         disponivel: '<span class="badge badge-disponivel">Disponível</span>',
@@ -214,9 +183,6 @@ function getStatusBadge(status) {
     return map[status] || `<span class="badge">${status}</span>`;
 }
 
-
-// ── Gerar HTML do badge de condição ──────────────────────────
-// Mesmo padrão de mapa do getStatusBadge, aplicado às condições físicas.
 function getCondicaoBadge(condicao) {
     const map = {
         Bom:     '<span class="badge badge-bom">Bom</span>',
@@ -226,89 +192,91 @@ function getCondicaoBadge(condicao) {
     return map[condicao] || `<span class="badge">${condicao}</span>`;
 }
 
-
-// ── Atualizar os cards de resumo ──────────────────────────────
-// Conta quantos chromebooks estão em cada status e atualiza
-// os números exibidos nos quatro cards no topo da página.
 function atualizarStats(sorted) {
     let disponivel = 0, emprestado = 0, manutencao = 0;
-
-    // Percorre todos os chromebooks e classifica cada um
     sorted.forEach(cb => {
         const s = getStatusReal(cb.plaqueta);
         if (s === 'disponivel')      disponivel++;
         else if (s === 'emprestado') emprestado++;
         else if (s === 'manutencao') manutencao++;
     });
-
-    // Atualiza o conteúdo de texto de cada card no DOM
     document.getElementById('totalCount').textContent      = sorted.length;
     document.getElementById('disponivelCount').textContent = disponivel;
     document.getElementById('emprestadoCount').textContent = emprestado;
     document.getElementById('manutencaoCount').textContent = manutencao;
 }
 
-
-// ── Editar a condição física do chromebook ────────────────────
-// Abre um prompt nativo do navegador para o usuário digitar a
-// nova condição. Normaliza o texto (primeira letra maiúscula,
-// restante minúscula) e valida antes de salvar.
-function editarCondicao(plaqueta) {
+// ── Editar condição ───────────────────────────────────────────
+async function editarCondicao(plaqueta) {
     const cb = chromebooks.find(c => c.plaqueta === plaqueta);
-    if (!cb) return; // segurança: interrompe se não encontrar
+    if (!cb) return;
 
-    const opcoes = ['Bom', 'Regular', 'Ruim'];
+    const opcoes  = ['Bom', 'Regular', 'Ruim'];
+    const nova    = prompt(`Chromebook ${plaqueta}\nCondição atual: ${cb.condicao}\n\nNova condição (Bom / Regular / Ruim):`);
+    if (!nova) return;
 
-    // prompt() exibe uma caixa de diálogo com campo de texto.
-    // Retorna null se o usuário cancelar.
-    const nova = prompt(
-        `Chromebook ${plaqueta}\nCondição atual: ${cb.condicao}\n\nNova condição (Bom / Regular / Ruim):`
-    );
-    if (!nova) return; // usuário cancelou ou deixou em branco
-
-    // Normaliza: "bom", "BOM", "bOm" → "Bom"
-    // charAt(0).toUpperCase() coloca a primeira letra em maiúsculo
-    // slice(1).toLowerCase() coloca o restante em minúsculo
     const normalizada = nova.trim().charAt(0).toUpperCase() + nova.trim().slice(1).toLowerCase();
-
     if (!opcoes.includes(normalizada)) {
         alert('Condição inválida. Escolha: Bom, Regular ou Ruim.');
         return;
     }
 
-    cb.condicao = normalizada; // atualiza o objeto diretamente (é uma referência)
-    salvar();
+    const { error } = await db
+        .from('chromebooks')
+        .update({ condicao: normalizada })
+        .eq('plaqueta', plaqueta);
+
+    if (error) {
+        console.error('Erro ao editar condição:', error.message);
+        alert('Erro ao salvar. Tente novamente.');
+        return;
+    }
+
+    cb.condicao = normalizada;
     renderizar();
 }
 
-
-// ── Alternar entre Disponível e Em Manutenção ─────────────────
-// Funciona como um toggle (interruptor):
-//   - Se está 'manutencao' → muda para 'disponivel'
-//   - Se está 'disponivel' → muda para 'manutencao'
-// O botão na tabela exibe "Liberar" ou "Manutenção" de acordo.
-function toggleManutencao(plaqueta) {
+// ── Alternar manutenção / disponível ──────────────────────────
+async function toggleManutencao(plaqueta) {
     const cb = chromebooks.find(c => c.plaqueta === plaqueta);
     if (!cb) return;
-    cb.status = cb.status === 'manutencao' ? 'disponivel' : 'manutencao';
-    salvar();
+
+    const novoStatus = cb.status === 'manutencao' ? 'disponivel' : 'manutencao';
+
+    const { error } = await db
+        .from('chromebooks')
+        .update({ status: novoStatus })
+        .eq('plaqueta', plaqueta);
+
+    if (error) {
+        console.error('Erro ao alterar status:', error.message);
+        alert('Erro ao salvar. Tente novamente.');
+        return;
+    }
+
+    cb.status = novoStatus;
     renderizar();
 }
 
-
-// ── Excluir chromebook do inventário ─────────────────────────
-// Antes de excluir, verifica se o chromebook está emprestado.
-// Se estiver, bloqueia a exclusão para evitar inconsistência
-// entre o inventário e os registros de empréstimo.
-function excluir(plaqueta) {
+// ── Excluir chromebook ────────────────────────────────────────
+async function excluir(plaqueta) {
     if (getStatusReal(plaqueta) === 'emprestado') {
         alert('Não é possível excluir um Chromebook que está emprestado.');
         return;
     }
-    if (confirm(`Excluir o Chromebook ${plaqueta} do inventário?`)) {
-        // filter() cria um novo array sem o item da plaqueta passada
-        chromebooks = chromebooks.filter(c => c.plaqueta !== plaqueta);
-        salvar();
-        renderizar();
+    if (!confirm(`Excluir o Chromebook ${plaqueta} do inventário?`)) return;
+
+    const { error } = await db
+        .from('chromebooks')
+        .delete()
+        .eq('plaqueta', plaqueta);
+
+    if (error) {
+        console.error('Erro ao excluir:', error.message);
+        alert('Erro ao excluir. Tente novamente.');
+        return;
     }
+
+    chromebooks = chromebooks.filter(c => c.plaqueta !== plaqueta);
+    renderizar();
 }
