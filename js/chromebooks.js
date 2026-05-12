@@ -66,10 +66,10 @@ async function carregar() {
     }
 
     // 2. Carrega empréstimos ativos para derivar o status de cada chromebook
-    // Busca apenas os campos necessários (plaqueta e status) para economizar banda
+    // Inclui 'nome' para exibir "com [Nome]" no badge de status do inventário
     const { data: empData, error: empError } = await db
         .from('emprestimos')
-        .select('plaqueta, status');
+        .select('plaqueta, status, nome');
 
     if (empError) {
         console.error('Erro ao carregar empréstimos:', empError.message);
@@ -145,7 +145,9 @@ function renderizar() {
 
     tbody.innerHTML = sorted.map(cb => {
         const statusReal    = getStatusReal(cb.plaqueta);
-        const statusBadge   = getStatusBadge(statusReal);
+        // Busca o nome do tomador para exibir "com Gabriel" no badge
+        const empAtivo      = emprestimos.find(e => e.plaqueta === cb.plaqueta && e.status === 'ativo');
+        const statusBadge   = getStatusBadge(statusReal, empAtivo?.nome);
         const condicaoBadge = getCondicaoBadge(cb.condicao);
         const podeExcluir   = statusReal !== 'emprestado';
 
@@ -180,10 +182,14 @@ function renderizar() {
     atualizarStats(sorted);
 }
 
-function getStatusBadge(status) {
+// nome é opcional: quando emprestado, exibe "com [Primeiro Nome]"
+function getStatusBadge(status, nome) {
+    if (status === 'emprestado') {
+        const primeiroNome = nome ? nome.split(' ')[0] : 'Alguém';
+        return `<span class="badge badge-emprestado">com ${primeiroNome}</span>`;
+    }
     const map = {
         disponivel: '<span class="badge badge-disponivel">Disponível</span>',
-        emprestado: '<span class="badge badge-emprestado">Emprestado</span>',
         manutencao: '<span class="badge badge-manutencao">Em Manutenção</span>',
     };
     return map[status] || `<span class="badge">${status}</span>`;
