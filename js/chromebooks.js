@@ -160,12 +160,14 @@ function renderizar() {
                 <td><strong>${cb.plaqueta}</strong></td>
                 <td>${condicaoBadge}</td>
                 <td>${statusBadge}</td>
-                <td class="acoes-cell">
-                    <button class="btn-sm btn-editar" onclick="editarCondicao('${cb.plaqueta}')">Editar</button>
-                    ${btnManutencao}
-                    ${podeExcluir
-                        ? `<button class="btn-sm btn-excluir-sm" onclick="excluir('${cb.plaqueta}')">Excluir</button>`
-                        : ''}
+                <td>
+                    <div class="acoes-cell">
+                        <button class="btn-sm btn-editar" onclick="editarCondicao('${cb.plaqueta}')">Editar</button>
+                        ${btnManutencao}
+                        ${podeExcluir
+                            ? `<button class="btn-sm btn-excluir-sm" onclick="excluir('${cb.plaqueta}')">Excluir</button>`
+                            : ''}
+                    </div>
                 </td>
             </tr>
         `;
