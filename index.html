@@ -1,68 +1,124 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Faz a página se adaptar ao tamanho da tela do dispositivo (responsividade).
+         Sem isso, celulares exibiriam a versão desktop em miniatura. -->
+
     <title>Seção de Empréstimo de Chromebooks</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
+
 <body>
+
+    <!-- Faixa azul no topo com o título do sistema.
+         A nav fica primeiro no DOM para aparecer à esquerda via flexbox.
+         O h1 é centralizado absolutamente sobre toda a largura do header. -->
     <header>
+        <nav class="header-nav">
+            <a href="chromebooks.html" class="nav-link">📋 Inventário</a>
+        </nav>
         <h1>Empréstimos de Chromebooks</h1>
     </header>
+
     <main>
+
+        <!-- ── Seção: Formulário de Empréstimo ───────────────── -->
+        <!-- id="recebe" permite referenciar esta seção pelo JS -->
+        <!-- class="recebe" aplica o estilo de card branco com sombra -->
         <section id="recebe" class="recebe">
             <h2>Recebimento</h2>
+
+            <!-- Formulário principal de registro de empréstimo.
+                 O submit é interceptado pelo scripts.js (e.preventDefault()).
+                 O atributo required em cada campo ativa a validação nativa do HTML. -->
             <form id="formEmprestimo">
+
+                <!-- Cada campo é um <article class="form-group"> para aplicar
+                     o layout em duas colunas via flexbox do CSS -->
+
                 <article class="form-group">
                     <label for="nome">Nome:</label>
+                    <!-- for="nome" associa o label ao input de id="nome",
+                         permitindo clicar no label para focar o campo -->
                     <input type="text" id="nome" name="nome" required>
                 </article>
+
                 <article class="form-group">
                     <label for="setor">Setor:</label>
                     <input type="text" id="setor" name="setor" required>
                 </article>
+
                 <article class="form-group">
                     <label for="matricula">Matrícula:</label>
                     <input type="text" id="matricula" name="matricula" required>
                 </article>
+
                 <article class="form-group">
                     <label for="telefone">Telefone:</label>
                     <input type="text" id="telefone" name="telefone" required>
                 </article>
+
                 <article class="form-group">
                     <label for="plaqueta">Número da plaqueta:</label>
+                    <!-- A plaqueta é o código de patrimônio gravado no equipamento.
+                         É usada como identificador único do chromebook. -->
                     <input type="text" id="plaqueta" name="plaqueta" required>
                 </article>
+
                 <article class="form-group">
                     <label for="data_emprestimo">Data de Empréstimo:</label>
+                    <!-- type="date" exibe um seletor de calendário no navegador.
+                         O valor é preenchido automaticamente com a data de hoje
+                         pelo scripts.js no evento DOMContentLoaded. -->
                     <input type="date" id="data_emprestimo" name="data_emprestimo" required>
                 </article>
+
                 <article class="form-group">
                     <label for="data_devolucao">Data de Devolução:</label>
+                    <!-- Data prevista para o aparelho ser devolvido.
+                         Se passar dessa data sem devolução, o status vira "ATRASADO". -->
                     <input type="date" id="data_devolucao" name="data_devolucao" required>
                 </article>
+
                 <article class="form-group">
                     <label for="cedente">Cedente:</label>
+                    <!-- O cedente é o funcionário responsável por entregar o chromebook.
+                         É um <select> fixo para padronizar as opções disponíveis. -->
                     <select name="cedente" id="cedente" required>
+                        <!-- disabled selected: aparece como texto padrão mas não pode ser enviado -->
                         <option value="" disabled selected>Selecione o cedente</option>
                         <option value="Jailson Borges - GAUST">Jailson Borges - GAUST</option>
                         <option value="Pabllo Silva - DTI">Pabllo Silva - DTI</option>
                     </select>
                 </article>
+
+                <!-- Botão que dispara o evento submit do formulário.
+                     O CSS aplica largura 100% e estilo azul preenchido. -->
                 <button type="submit">Emprestar</button>
             </form>
         </section>
 
-        <!-- Seção de Registros -->
+
+        <!-- ── Seção: Lista de Empréstimos Registrados ───────── -->
+        <!-- Esta seção é populada dinamicamente pelo scripts.js.
+             O conteúdo inicial é substituído pelos cards de empréstimo. -->
         <section id="registros" class="recebe" style="margin-top: 32px;">
             <h2>Empréstimos Registrados</h2>
+
+            <!-- Container onde os cards de empréstimo são inseridos via JS.
+                 Começa com a mensagem de estado vazio e é atualizado
+                 pela função renderizarEmprestimos() do scripts.js. -->
             <div id="listaEmprestimos">
                 <p class="sem-registros">Nenhum empréstimo registrado ainda.</p>
             </div>
         </section>
+
     </main>
 
+    <!-- O script é carregado no final do body para garantir que todos os
+         elementos HTML acima já existam quando o JS tentar acessá-los. -->
     <script src="js/scripts.js"></script>
 </body>
 </html>

@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário de Chromebooks</title>
+    <!-- Título exibido na aba do navegador -->
+    <link rel="stylesheet" href="css/estilos.css">
+    <!-- Arquivo de estilos compartilhado com index.html -->
+</head>
+
+<body>
+
+    <!-- ── Cabeçalho ─────────────────────────────────────────── -->
+    <!-- Mesma faixa azul do index.html, mas com título diferente.
+         A nav fica primeiro no DOM para aparecer à esquerda via flexbox.
+         O h1 é centralizado absolutamente sobre toda a largura do header. -->
+    <header>
+        <nav class="header-nav">
+            <a href="index.html" class="nav-link">← Empréstimos</a>
+        </nav>
+        <h1>Inventário de Chromebooks</h1>
+    </header>
+
+    <!-- ── Conteúdo principal ─────────────────────────────────── -->
+    <main>
+
+        <!-- ── Seção: Cards de Resumo ────────────────────────── -->
+        <!-- Exibe 4 contadores: Total, Disponíveis, Emprestados e Em Manutenção.
+             Os números são atualizados pelo JS via atualizarStats().
+             Cada card tem uma borda colorida no topo definida pela class extra:
+             stat-disponivel (verde), stat-emprestado (azul), stat-manutencao (amarelo). -->
+        <section class="stats-section">
+
+            <!-- Card: total de chromebooks cadastrados no inventário -->
+            <div class="stat-card">
+                <!-- id="totalCount" é atualizado pelo chromebooks.js -->
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+
+            <!-- Card: chromebooks disponíveis para empréstimo -->
+            <div class="stat-card stat-disponivel">
+                <div class="stat-number" id="disponivelCount">0</div>
+                <div class="stat-label">Disponíveis</div>
+            </div>
+
+            <!-- Card: chromebooks atualmente emprestados (derivado de emprestimos) -->
+            <div class="stat-card stat-emprestado">
+                <div class="stat-number" id="emprestadoCount">0</div>
+                <div class="stat-label">Emprestados</div>
+            </div>
+
+            <!-- Card: chromebooks marcados como em manutenção -->
+            <div class="stat-card stat-manutencao">
+                <div class="stat-number" id="manutencaoCount">0</div>
+                <div class="stat-label">Em Manutenção</div>
+            </div>
+
+        </section>
+
+
+        <!-- ── Seção: Formulário de Cadastro ─────────────────── -->
+        <!-- Permite adicionar um novo chromebook ao inventário.
+             class="recebe" aplica o estilo de card branco com sombra.
+             O submit é tratado pelo chromebooks.js. -->
+        <section class="recebe" style="margin-bottom: 24px;">
+            <h2>Adicionar Chromebook</h2>
+
+            <form id="formChromebook">
+
+                <!-- Campo: número da plaqueta (identificador único do equipamento) -->
+                <article class="form-group">
+                    <label for="plaqueta">Número da Plaqueta:</label>
+                    <!-- placeholder mostra um exemplo para orientar o preenchimento -->
+                    <input type="text" id="plaqueta" name="plaqueta" placeholder="Ex: 001234" required>
+                </article>
+
+                <!-- Campo: estado físico do equipamento no momento do cadastro -->
+                <article class="form-group">
+                    <label for="condicao">Condição:</label>
+                    <select id="condicao" name="condicao" required>
+                        <!-- Opção vazia como placeholder; disabled impede que seja submetida -->
+                        <option value="" disabled selected>Selecione a condição</option>
+                        <option value="Bom">Bom</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Ruim">Ruim</option>
+                    </select>
+                </article>
+
+                <!-- Campo: status inicial ao adicionar ao inventário.
+                     Não aparece "Emprestado" aqui porque esse status
+                     é derivado automaticamente pelo JS ao consultar empréstimos. -->
+                <article class="form-group">
+                    <label for="statusInicial">Status Inicial:</label>
+                    <select id="statusInicial" name="statusInicial" required>
+                        <option value="disponivel">Disponível</option>
+                        <option value="manutencao">Em Manutenção</option>
+                    </select>
+                </article>
+
+                <!-- Botão de envio; o CSS aplica largura 100% e cor azul -->
+                <button type="submit">Adicionar ao Inventário</button>
+            </form>
+        </section>
+
+
+        <!-- ── Seção: Tabela de Inventário ───────────────────── -->
+        <!-- A tabela é populada dinamicamente pelo chromebooks.js.
+             O <tbody id="chromebooksBody"> começa com uma linha vazia
+             e é substituído pela função renderizar(). -->
+        <section class="recebe">
+            <h2>Chromebooks Cadastrados</h2>
+
+            <!-- Wrapper com overflow-x: auto para a tabela rolar
+                 horizontalmente em telas pequenas sem quebrar o layout -->
+            <div class="table-container">
+                <table id="tabelaChromebooks">
+
+                    <!-- Cabeçalho fixo da tabela com os nomes das colunas -->
+                    <thead>
+                        <tr>
+                            <th>Plaqueta</th>   <!-- Número do patrimônio -->
+                            <th>Condição</th>   <!-- Estado físico: Bom / Regular / Ruim -->
+                            <th>Status</th>     <!-- Disponível / Emprestado / Em Manutenção -->
+                            <th>Ações</th>      <!-- Botões: Editar, Manutenção, Excluir -->
+                        </tr>
+                    </thead>
+
+                    <!-- Corpo da tabela preenchido pelo JS.
+                         O id="chromebooksBody" é referenciado pelo renderizar(). -->
+                    <tbody id="chromebooksBody">
+                        <!-- Linha exibida enquanto não há dados cadastrados.
+                             colspan="4" faz a célula ocupar todas as 4 colunas. -->
+                        <tr>
+                            <td colspan="4" class="sem-registros">Nenhum Chromebook cadastrado ainda.</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script da página de inventário.
+         Separado do scripts.js para não conflitar com os listeners
+         de elementos que só existem em index.html (ex: #formEmprestimo). -->
+    <script src="js/chromebooks.js"></script>
+</body>
+</html>

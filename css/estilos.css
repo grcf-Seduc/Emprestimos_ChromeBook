@@ -1,56 +1,104 @@
+﻿/* ============================================================
+   estilos.css — Estilos globais do Sistema de Empréstimos
+   Usado por: index.html e chromebooks.html
+   ============================================================ */
+
+
+/* ── Fonte externa ────────────────────────────────────────────
+   Importa a fonte Inter do Google Fonts.
+   Os pesos 400 (regular), 500 (médio), 600 (semibold) e 700 (bold)
+   são os utilizados ao longo das páginas. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+
+/* ── Variáveis CSS (Custom Properties) ───────────────────────
+   Centralizam as cores e valores reutilizados em todo o arquivo.
+   Para mudar a cor primária do sistema, basta alterar --primary aqui. */
 :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --bg-main: #f1f5f9;
-    --bg-card: #ffffff;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --radius: 12px;
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
+    --primary:       #2563eb;  /* azul principal: botões, bordas de foco, badges */
+    --primary-hover: #1d4ed8;  /* tom mais escuro do azul para estado hover */
+    --bg-main:       #f1f5f9;  /* cinza-azulado claro: fundo geral da página */
+    --bg-card:       #ffffff;  /* branco: fundo dos cards/seções */
+    --text-main:     #0f172a;  /* quase preto: texto principal */
+    --text-muted:    #64748b;  /* cinza médio: textos secundários e labels */
+    --border:        #e2e8f0;  /* cinza claro: bordas de inputs e divisores */
+    --radius:        12px;     /* arredondamento padrão dos cards */
+    --shadow:        0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* sombra suave */
+    --success:       #10b981;  /* verde: status ativo, condição boa, disponível */
+    --warning:       #f59e0b;  /* amarelo: avisos, manutenção */
+    --danger:        #ef4444;  /* vermelho: erros, atrasos, excluir */
 }
 
+
+/* ── Reset básico ─────────────────────────────────────────────
+   Remove margens e paddings padrão do navegador (que variam entre
+   Chrome, Firefox, Safari etc.) e aplica box-sizing: border-box,
+   que faz o padding/border serem incluídos na largura/altura do elemento
+   em vez de somados a ela. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+
+/* ── Estilo do body ───────────────────────────────────────────
+   Define a fonte, cor de fundo e espaçamento base de toda a página. */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
-    line-height: 1.6;
-    padding-bottom: 32px;
+    line-height: 1.6;       /* altura de linha = 1.6x o tamanho da fonte, melhora legibilidade */
+    padding-bottom: 32px;   /* espaço extra no rodapé para não cortar conteúdo */
 }
 
+
+/* ── Cabeçalho ────────────────────────────────────────────────
+   Faixa azul escuro no topo presente em todas as páginas.
+   Usa flexbox para posicionar a nav à esquerda e position: relative
+   para permitir que o h1 seja centralizado absolutamente. */
 header {
     background-color: #1d4ed8;
-    padding: 32px 16px;
-    text-align: center;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    position: relative;     /* permite posicionamento absoluto do h1 filho */
+    min-height: 80px;       /* altura mínima para o h1 não sair dos limites */
     border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
+    margin-bottom: 32px;    /* espaço entre o header e o conteúdo principal */
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
+/* Título centralizado absolutamente sobre toda a largura do header.
+   left: 0 e right: 0 fazem o h1 ocupar 100% da largura do header,
+   e text-align: center centraliza o texto dentro dessa largura.
+   pointer-events: none impede que o texto bloqueie cliques na nav. */
 h1 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
     font-size: 28px;
     font-weight: 700;
     color: white;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.025em; /* comprime levemente o espaçamento entre letras */
+    pointer-events: none;     /* cliques "passam" pelo h1 e alcançam os botões */
 }
 
+
+/* ── Área de conteúdo principal ──────────────────────────────
+   Centraliza o conteúdo e limita a largura máxima para não
+   ficar muito largo em monitores grandes. */
 main {
     max-width: 900px;
-    margin: 0 auto;
-    padding: 0 16px;
+    margin: 0 auto;   /* centraliza horizontalmente */
+    padding: 0 16px;  /* margem lateral em telas pequenas */
 }
 
+
+/* ── Card branco padrão ───────────────────────────────────────
+   Classe usada nas seções de formulário e listas.
+   Cria o efeito de "card" com fundo branco, bordas arredondadas e sombra. */
 .recebe {
     background-color: var(--bg-card);
     padding: 32px;
@@ -58,6 +106,9 @@ main {
     box-shadow: var(--shadow);
 }
 
+
+/* ── Títulos de seção (h2) ────────────────────────────────────
+   Usa flexbox para alinhar o ícone vertical colorido ao lado do texto. */
 h2 {
     font-size: 21px;
     font-weight: 600;
@@ -68,8 +119,10 @@ h2 {
     gap: 8px;
 }
 
+/* Barra vertical azul decorativa antes de cada h2.
+   Criada com pseudo-elemento ::before para não precisar de HTML extra. */
 h2::before {
-    content: '';
+    content: '';           /* necessário para pseudo-elementos aparecerem */
     display: block;
     width: 4px;
     height: 20px;
@@ -77,19 +130,25 @@ h2::before {
     border-radius: 2px;
 }
 
+
+/* ── Formulários ──────────────────────────────────────────────
+   flex-wrap: wrap permite que os campos quebrem linha em telas menores. */
 form {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
 }
 
+/* Cada campo (label + input) ocupa pelo menos 300px,
+   expandindo para preencher o espaço disponível. */
 .form-group {
-    flex: 1 1 300px;
+    flex: 1 1 300px;       /* flex-grow:1, flex-shrink:1, flex-basis:300px */
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
+/* Label acima do campo */
 label {
     display: block;
     font-size: 14px;
@@ -97,6 +156,7 @@ label {
     color: var(--text-main);
 }
 
+/* Estilo unificado para inputs de texto, data e selects */
 input[type="text"],
 input[type="date"],
 select {
@@ -105,11 +165,12 @@ select {
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 15px;
-    font-family: inherit;
+    font-family: inherit;  /* herda a fonte Inter em vez de usar a padrão do sistema */
     transition: all 0.2s ease;
     background-color: #fff;
 }
 
+/* Efeito de foco: borda azul + anel de destaque (acessibilidade) */
 input:focus,
 select:focus {
     outline: none;
@@ -117,6 +178,9 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+
+/* ── Botão de envio dos formulários ──────────────────────────
+   Ocupa 100% da largura e fica na parte inferior do formulário. */
 button[type="submit"] {
     width: 100%;
     background-color: var(--primary);
@@ -136,11 +200,14 @@ button[type="submit"]:hover {
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
+/* Simula pressionar o botão ao clicar (desloca 1px para baixo) */
 button[type="submit"]:active {
     transform: translateY(1px);
 }
 
-/* Estilos para os registros */
+
+/* ── Mensagem de estado vazio ─────────────────────────────────
+   Exibida quando não há empréstimos ou chromebooks cadastrados. */
 .sem-registros {
     text-align: center;
     color: var(--text-muted);
@@ -148,6 +215,9 @@ button[type="submit"]:active {
     font-style: italic;
 }
 
+
+/* ── Cards de empréstimo (página index.html) ─────────────────
+   Cada empréstimo registrado é exibido como um card individual. */
 .emprestimo-card {
     background-color: #f8fafc;
     border: 1px solid var(--border);
@@ -157,10 +227,12 @@ button[type="submit"]:active {
     transition: all 0.2s ease;
 }
 
+/* Sombra ao passar o mouse: dá sensação de elevação */
 .emprestimo-card:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Cabeçalho do card: nome à esquerda, plaqueta à direita */
 .emprestimo-header {
     display: flex;
     justify-content: space-between;
@@ -169,12 +241,14 @@ button[type="submit"]:active {
     gap: 16px;
 }
 
+/* Nome do tomador em destaque */
 .emprestimo-titulo {
     font-size: 16px;
     font-weight: 600;
     color: var(--text-main);
 }
 
+/* Badge azul com o número da plaqueta */
 .plaqueta-badge {
     background-color: var(--primary);
     color: white;
@@ -182,9 +256,11 @@ button[type="submit"]:active {
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
-    white-space: nowrap;
+    white-space: nowrap; /* impede quebra de linha no número */
 }
 
+/* Grade responsiva com os detalhes do empréstimo:
+   auto-fit + minmax faz as colunas se ajustarem automaticamente. */
 .emprestimo-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -192,12 +268,14 @@ button[type="submit"]:active {
     margin-bottom: 12px;
 }
 
+/* Cada par label/valor dentro da grade */
 .info-item {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
+/* Label pequeno e em maiúsculas (estilo "capslock") */
 .info-label {
     font-size: 12px;
     color: var(--text-muted);
@@ -206,27 +284,31 @@ button[type="submit"]:active {
     letter-spacing: 0.05em;
 }
 
+/* Valor do campo em tamanho normal */
 .info-value {
     font-size: 14px;
     color: var(--text-main);
     font-weight: 500;
 }
 
+/* Rodapé do card: status à esquerda, botões à direita */
 .emprestimo-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border); /* linha divisória sutil */
 }
 
+/* Agrupa os badges de status lado a lado */
 .status-container {
     display: flex;
     gap: 8px;
     align-items: center;
 }
 
+/* Badge base de status (cor definida pelas classes abaixo) */
 .status-badge {
     padding: 4px 10px;
     border-radius: 6px;
@@ -234,20 +316,29 @@ button[type="submit"]:active {
     font-weight: 600;
 }
 
+/* Badge azul claro: indica que o termo foi assinado fisicamente */
 .status-assinado {
     background-color: #e0f2fe;
     color: #0369a1;
 }
 
+/* Badge verde: empréstimo dentro do prazo */
 .status-ativo {
     background-color: #dcfce7;
     color: #166534;
 }
 
+/* Badge vermelho: empréstimo passou da data de devolução */
 .status-atrasado {
     background-color: #fee2e2;
     color: #991b1b;
 }
+
+
+/* ── Botões de ação dos cards de empréstimo ──────────────────
+
+   Três botões: Termo (azul), Devolver (verde), Excluir (vermelho).
+   Todos compartilham o mesmo padrão de padding, borda e transição. */
 
 .btn-assinar {
     background-color: var(--primary);
@@ -280,7 +371,7 @@ button[type="submit"]:active {
 }
 
 .btn-devolver:hover {
-    background-color: #059669;
+    background-color: #059669; /* verde mais escuro */
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 
@@ -298,16 +389,21 @@ button[type="submit"]:active {
 }
 
 .btn-excluir:hover {
-    background-color: #dc2626;
+    background-color: #dc2626; /* vermelho mais escuro */
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
+
+/* ── Rastreamento de assinatura física ───────────────────────
+   Seção abaixo dos botões com o checkbox "Assinado fisicamente".
+   A borda tracejada (dashed) diferencia visualmente dessa área. */
 .signature-tracking {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px dashed var(--border);
 }
 
+/* Layout do checkbox com seu texto lado a lado */
 .checkbox-container {
     display: flex;
     align-items: center;
@@ -317,24 +413,254 @@ button[type="submit"]:active {
     cursor: pointer;
 }
 
+/* Tamanho fixo para o checkbox ser visível e clicável */
 .checkbox-container input {
     width: 16px;
     height: 16px;
     cursor: pointer;
 }
 
+
+/* ── Responsividade para telas estreitas ─────────────────────
+   Em telas menores que 680px, os elementos em linha viram coluna. */
 @media (max-width: 680px) {
+    /* Plaqueta vai abaixo do nome em vez de ficar à direita */
     .emprestimo-header {
         flex-direction: column;
     }
-    
+
+    /* Uma coluna por vez nos detalhes */
     .emprestimo-info {
         grid-template-columns: 1fr;
     }
-    
+
+    /* Status e botões ficam em coluna, cada um ocupando 100% */
     .emprestimo-footer {
         flex-direction: column;
         gap: 12px;
         align-items: stretch;
     }
 }
+
+/* Em telas muito pequenas, o h1 absoluto e a nav não colidem:
+   o header vira coluna com nav em cima e h1 abaixo (estático). */
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        min-height: unset;
+    }
+
+    h1 {
+        position: static;  /* volta ao fluxo normal em mobile */
+        font-size: 22px;
+    }
+}
+
+
+/* ============================================================
+   Estilos exclusivos da página de Inventário (chromebooks.html)
+   ============================================================ */
+
+
+/* ── Link de navegação no cabeçalho ──────────────────────────
+   Fica no canto esquerdo graças ao display: flex do header.
+   position: relative + z-index: 1 garante que fica acima do h1
+   absolutamente posicionado, tornando o clique possível. */
+.header-nav {
+    position: relative;
+    z-index: 1;             /* sobrepõe o h1 absolutamente posicionado */
+    flex-shrink: 0;         /* não encolhe mesmo com h1 ocupando espaço */
+}
+
+/* Botão-link estilizado, muito mais visível que um link simples.
+   inline-flex alinha o ícone e o texto verticalmente.
+   O fundo semi-transparente (rgba branco) e a borda criam o "pill button". */
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;              /* negrito para mais destaque */
+    padding: 9px 18px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.18);  /* branco semi-transparente */
+    border: 1.5px solid rgba(255, 255, 255, 0.5); /* borda branca semi-transparente */
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
+    white-space: nowrap;           /* evita quebra de linha no texto */
+}
+
+/* Ao passar o mouse: fundo mais opaco, borda totalmente branca,
+   leve elevação (translateY) e sombra para reforçar o efeito de botão. */
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.9);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Ao clicar: retorna à posição original (feedback visual de pressão) */
+.nav-link:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+
+/* ── Seção de cards de resumo (Stats) ────────────────────────
+   Grade com 4 cards que se adaptam ao espaço disponível.
+   repeat(auto-fit, minmax(150px, 1fr)) faz as colunas se ajustarem
+   automaticamente: em telas largas fica 4 colunas, em pequenas empilha. */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto 24px; /* centraliza e dá espaço abaixo */
+    padding: 0 16px;
+}
+
+/* Card base de resumo com borda colorida no topo */
+.stat-card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 16px;
+    text-align: center;
+    border-top: 4px solid var(--border); /* cor padrão (sobrescrita pelas classes abaixo) */
+}
+
+/* Bordas coloridas por tipo: cada cor comunica o significado do card */
+.stat-card.stat-disponivel { border-top-color: var(--success); } /* verde */
+.stat-card.stat-emprestado { border-top-color: var(--primary); } /* azul */
+.stat-card.stat-manutencao { border-top-color: var(--warning); } /* amarelo */
+
+/* Número grande em destaque no centro do card */
+.stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1; /* sem espaço extra acima/abaixo */
+}
+
+/* Texto descritivo abaixo do número */
+.stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+
+/* ── Container da tabela ─────────────────────────────────────
+   overflow-x: auto adiciona barra de rolagem horizontal quando a tabela
+   não cabe na tela (útil em dispositivos móveis). */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Tabela ocupa 100% do container; border-collapse remove espaços entre células */
+#tabelaChromebooks {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+/* Cabeçalho da tabela: fundo levemente acinzentado e texto em maiúsculas */
+#tabelaChromebooks th {
+    text-align: left;
+    padding: 10px 14px;
+    background-color: #f8fafc;
+    border-bottom: 2px solid var(--border); /* linha mais grossa abaixo do cabeçalho */
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+/* Células do corpo da tabela */
+#tabelaChromebooks td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle; /* alinha verticalmente ao centro */
+}
+
+/* Remove a borda inferior da última linha para não duplicar com o card */
+#tabelaChromebooks tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Destaque sutil ao passar o mouse sobre uma linha */
+#tabelaChromebooks tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* Célula de ações usa flexbox para alinhar os botões lado a lado */
+.acoes-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap; /* quebra linha se não couber na célula */
+}
+
+
+/* ── Badges coloridos (inventário) ───────────────────────────
+   Pequenas etiquetas arredondadas que comunicam status e condição
+   de forma visual e rápida. */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap; /* impede quebra de linha dentro do badge */
+}
+
+/* Status: Disponível → verde */
+.badge-disponivel { background-color: #dcfce7; color: #166534; }
+
+/* Status: Emprestado → azul */
+.badge-emprestado { background-color: #dbeafe; color: #1d4ed8; }
+
+/* Status: Em Manutenção → amarelo */
+.badge-manutencao { background-color: #fef9c3; color: #854d0e; }
+
+/* Condição: Bom → verde */
+.badge-bom     { background-color: #dcfce7; color: #166534; }
+
+/* Condição: Regular → laranja suave */
+.badge-regular { background-color: #fef3c7; color: #92400e; }
+
+/* Condição: Ruim → vermelho suave */
+.badge-ruim    { background-color: #fee2e2; color: #991b1b; }
+
+
+/* ── Botões pequenos das linhas da tabela ─────────────────────
+   Menores que os botões de submit para não ocupar tanto espaço
+   nas células da coluna "Ações". */
+.btn-sm {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Botão Editar: azul claro */
+.btn-editar       { background-color: #e0f2fe; color: #0369a1; }
+.btn-editar:hover { background-color: #bae6fd; }
+
+/* Botão Manutenção/Liberar: amarelo */
+.btn-manutencao       { background-color: #fef3c7; color: #92400e; }
+.btn-manutencao:hover { background-color: #fde68a; }
+
+/* Botão Excluir (tabela): vermelho suave (diferente do btn-excluir dos cards) */
+.btn-excluir-sm       { background-color: #fee2e2; color: #991b1b; }
+.btn-excluir-sm:hover { background-color: #fecaca; }
